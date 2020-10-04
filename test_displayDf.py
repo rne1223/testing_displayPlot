@@ -6,7 +6,6 @@ data = pd.read_csv("data.csv", index_col=0)
 
 
 def test_good_freq():
-    assert displayDf(data, freq='d') is None
     assert displayDf(data, freq='m') is None
     assert displayDf(data, freq='y') is None
 
