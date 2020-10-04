@@ -2,18 +2,20 @@ import pytest
 import pandas as pd
 from .displayDf import displayDf
 
-data = pd.read_csv("../pge-electrical-gas-and-weather/final.csv",index_col=0)
+data = pd.read_csv("data.csv", index_col=0)
+
 
 def test_good_freq():
-    assert displayDf(data,freq='d') == None
-    assert displayDf(data,freq='m') == None
-    assert displayDf(data,freq='y') == None
+    assert displayDf(data, freq='d') is None
+    assert displayDf(data, freq='m') is None
+    assert displayDf(data, freq='y') is None
+
 
 def test_bad_freq():
     with pytest.raises(ValueError):
-        displayDf(data,freq='p')
-        displayDf(data,freq='A')
-        displayDf(data,freq='i')
+        displayDf(data, freq='p')
+        displayDf(data, freq='A')
+        displayDf(data, freq='i')
 
 
 # def test_freqMonth():
