@@ -1,6 +1,9 @@
 # %%
-# import math
+import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
+
+%matplotlib inline
 
 def plotData(tmp_df, title='None'):
     # modified code from https://stackoverflow.com/questions/51105648/ordering-and-formatting-dates-on-x-axis-in-seaborn-bar-plot
@@ -16,9 +19,9 @@ def plotData(tmp_df, title='None'):
     fig, ax = plt.subplots(figsize = (12,6))    
 
     tmp_df = tmp_df.reset_index()
-    x_dates = tmp_df['date'].dt.strftime('%m-%d')
+    x_dates = tmp_df['DATE'].dt.strftime('%m-%d')
 
-    barchart = sns.barplot(data = tmp_df, x = x_dates, y = "electrical_usage", ax=ax
+    barchart = sns.barplot(data = tmp_df, x = x_dates, y = "usage".upper(), ax=ax
     ,palette="Reds_d", label="electricity")
 
     # Handling plot title
@@ -34,6 +37,7 @@ def plotData(tmp_df, title='None'):
 # %%
 import pandas as pd
 import re
+
 from dateutil import parser
 import sys
 
@@ -45,6 +49,11 @@ dtf = dtf.set_index('DATE')
 # print(dtf.index.year.unique()[0])
 
 def displayDf(dtf, freq='y', Y=None, M=None):
+
+# TODO:
+# The code below needs to be replaced with .loc to filter the dataframe
+# and then use group to split the dataframe into different frequencies.
+# However, this works for now as my first implementation
 
     months = ['jan','feb','mar',
             'apr','may','jun',
@@ -70,41 +79,31 @@ def displayDf(dtf, freq='y', Y=None, M=None):
                 found_year.append(int(year))
 
 
-#     # Split dataframe
+    # Split dataframe
     g = dtf.groupby(pd.Grouper(freq=freq.upper()))
     dfs = [[time_stamp,group] for time_stamp,group in g]
 
     dtToPlot = pd.DataFrame()
     for df in dfs:
-        # print('dec' in df[0].month_name().lower())
-        # print(df[0].year)
-        # print(2014 in found_year[0])
         if(freq == 'y'): # plot all the years
             if(found_year):
                 if(df[0].year in found_year):
-                    print(df[0].year,':',df[1].shape)
-                    # print(df[1])
-                    # dtToPlot = dtToPlot.append(df[1])
+                    plotData(df[1],title=f'Year {df[0].year}')
             else:
-                print(df[0].year,':',df[1].shape)
-                # # print(df[1])
-                # dtToPlot = dtToPlot.append(df[1])
+                plotData(df[1],title=f'Year {df[0].year}')
         elif(freq == 'm'):
             dtfmonth = df[0].month_name().lower()[0:3]
-
             if(found_month and not found_year): # print month from all years
                 if(dtfmonth in found_month):
-                    print(df[0].year,':', dtfmonth)
+                    plotData(df[1],title=f"{dtfmonth.upper()} {df[0].year} ")
             if(found_month and found_year): # print month from specific year
                 if ((dtfmonth in found_month) and (df[0].year in found_year)):
-                        print(df[0].year,':', dtfmonth)
-            
+                    plotData(df[1],title=f"{dtfmonth.upper()} {df[0].year} ")
+            if(Y is None and M is None):
+                plotData(df[1],title=f"{dtfmonth.upper()} {df[0].year} ")
 
-#         # plotData(df[1], title='Hello world')
-
-# displayDf(dtf,freq='m')
-# # displayDf(dtf, freq='m')
-# displayDf(dtf,mfilter='Jan Sep')
+# displayDf(dtf)
+# displayDf(dtf, freq='m')
+# displayDf(dtf,M='Jan Sep')
 # displayDf(dtf,freq='m',M='may',Y='2015')
-displayDf(dtf,freq='m',Y='2015 2017', M='may')
-# # displayDf(dtf,mfilter='Jan Sep',y='2014')
+# displayDf(dtf,freq='m',Y='2015 2017', M='may')
